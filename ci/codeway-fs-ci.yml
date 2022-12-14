@@ -1,0 +1,54 @@
+# file: codeway-fs-ci.yaml
+# Perform a CI run for the Krypton files service (FS)
+# using CodeWay (wraps Azure DevOps)
+
+# HP CodeWay fixed header to load the pipeline templates
+resources:
+  repositories:
+  - repository: templates
+    type: githubenterprise
+    name: codeway/templates
+    endpoint: ghe
+  - repository: fs
+    type: githubenterprise
+    name: krypton/fs
+    endpoint: ghe
+
+# Define the triggers for the pipeline.
+trigger: # Trigger on branches
+- main
+
+# Trigger on pull requests towards branches
+pr:
+- main
+
+pool: 'CodeWayAWSLinux'
+
+# Variable groups including configurations and secrets you want to use in this 
+# pipeline (Pipeline -> Library in ADO UI)
+variables:
+- group: Defaults
+- name: gheHostName 
+  value: 'github.azc.ext.hp.com'
+
+jobs:
+- job: checkout_sources
+  displayName: Build and publish the Files Service
+  timeoutInMinutes: 5
+  steps:
+  - checkout: fs
+
+  - template: steps/git/git-persist-credentials-v0.yaml@templates
+    parameters:
+      enableGitLFS: false
+
+  - template: steps/git/git-config-v0.yaml@templates
+    parameters:
+      gheUser: $(ghe_user)        # To be able to download GHE published libraries
+      gheToken: $(ghe_auth_token) # To be able to release command line tools and to be able to download GHE published libraries
+
+  - script: |
+      export CR_PAT=$(ghe_auth_token)
+      echo $CR_PAT | docker login docker.github.azc.ext.hp.com -u $(ghe_user) --password-stdin
+      make -C fs publish
+    displayName: Build and publish the fs docker image

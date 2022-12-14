@@ -1,0 +1,65 @@
+loggers:
+- log:
+  kind: log
+  env:
+    Level: debug
+    Format: text
+servers:
+- http:
+  kind: http
+  env:
+    Port: 1234
+    Address: 0.0.0.0
+sqloptions:
+- sql:
+  kind: sql
+  env:
+    Max_Idle_Conns: 10
+    Max_Open_Conns: 100
+    Max_Lifetime: 1
+backends:
+- postgres:
+  kind: postgres
+  env:
+    User: test
+    Pass: test
+    Dbname: fs
+    Host: 127.0.0.1
+    Port: 5432
+    Migrate: true
+stores:
+- use:
+  kind: use
+  env:
+    File_Store: awss3_minio_local
+    Listener: false
+    Listener_Only_Mode: false
+    Bucket_Space_Size: 10
+- awss3:
+  kind: awss3
+  env:
+    Bucket_Name: mytestkrypton20221130    
+    Presign_Duration_Min: 15
+- awss3_minio_local:
+  kind: awss3_minio_local
+  env:
+    Bucket_Name: mytestkrypton20221130        
+    Presign_Duration_Min: 15
+    Host: localhost
+    Port: 9000
+    Secure: false
+    Access_Key_ID: minioadmin
+    Secret_Access_Key: minioadmin
+    Account_ID: minioadmin
+    Region: eu-central-1
+- awss3_minio_play:
+  kind: awss3_minio_play
+  env:
+    Bucket_Name: mytestkrypton20221130        
+    Presign_Duration_Min: 15
+    Host: play.min.io
+    Secure: true
+    Access_Key_ID: Q3AM3UQ867SPQQA43P2F
+    Secret_Access_Key: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
+    Account_ID: account
+    Region: us-east-1

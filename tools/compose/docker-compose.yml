@@ -1,0 +1,35 @@
+version: '3'
+services:
+  db:
+    image: docker.github.azc.ext.hp.com/krypton/utils/krypton-db
+    hostname: ${DB}.${DOMAIN}
+    container_name: ${DB}.${DOMAIN}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    networks:
+      backend:
+        aliases:
+          - ${DB}.${DOMAIN}
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    tty: true
+  minio:
+    image: docker.github.azc.ext.hp.com/krypton/utils/krypton-local-storage
+    hostname: ${LOCALFS}.${DOMAIN}
+    container_name: ${LOCALFS}.${DOMAIN}
+    ports:
+      - ${LOCALFS_PORT}:${LOCALFS_PORT}
+    networks:
+      backend:
+        aliases:
+          - ${LOCALFS}.${DOMAIN}
+    environment:
+      - MINIO_ACCESS_KEY=${LOCALFS_USER}
+      - MINIO_SECRET_KEY=${LOCALFS_PASS}
+      - FS_BUCKET_NAMES=${LOCALFS_BUCKET_NAMES}
+    tty: true
+networks:
+  backend:
+    driver: bridge

@@ -1,0 +1,27 @@
+clean:
+	$(GOCLEAN)
+	find . -name "*~" -exec rm -f {} \;
+	docker rmi -f $(DOCKER_IMAGE) 2>/dev/null 1>&2
+	docker image prune -f 2>/dev/null 1>&2
+	rm -rf $(BIN)
+
+tidy:
+	go mod tidy
+
+fmt:
+	go fmt ./...
+
+vet:
+	go vet ./...
+
+lint: check_golint
+	golint ./...
+
+run-test:
+	(cd test; ./run-test-all.sh)
+
+unit-test:
+	go test ./...
+	
+tar: check_tar clean
+	tar -czvf ~/$(TARGET).tar.gz *

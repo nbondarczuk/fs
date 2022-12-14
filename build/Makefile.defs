@@ -1,0 +1,22 @@
+TARGET=fs
+
+BIN=./bin
+SRC=.
+
+GOCMD=go
+GOBUILD=CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOCMD) build
+GOCLEAN=$(GOCMD) clean
+GOTEST=$(GOCMD) test
+GOGET=$(GOCMD) get
+
+GIT_COMMIT := $(shell git rev-list -1 HEAD)
+BUILT_ON := $(shell hostname)
+BUILD_DATE := $(shell date +%FT%T%z)
+
+LDFLAGS := "-X main.gitCommitHash=$(GIT_COMMIT) -X main.builtAt=$(BUILD_DATE) -X main.builtBy=$(USER) -X main.builtOn=$(BUILT_ON)"
+
+DOCKER_IMAGE=fs
+GHCR_IMAGE=docker.github.azc.ext.hp.com/krypton/fs/$(DOCKER_IMAGE)
+
+HAS_GO_LINT:=$(shell command -v golint 2> /dev/null)
+HAS_GO_IMPORTS:=$(shell command -v goimports 2>/dev/null)
